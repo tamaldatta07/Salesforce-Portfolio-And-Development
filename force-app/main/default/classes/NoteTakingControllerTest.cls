@@ -1,37 +1,73 @@
 @isTest
-private class NoteTakingControllerTest {
-
+public class NoteTakingControllerTest {
     @isTest
     static void testCreateNoteRecord() {
-        // Test data setup
-        String title = 'Test Note';
-        String description = 'This is a test note description.';
-
-        // Test the scenario when title is not blank
         Test.startTest();
-        Boolean result = NoteTakingController.createNoteRecord(title, description);
+        Boolean result = NoteTakingController.createNoteRecord('Test Title', 'Test Description');
         Test.stopTest();
 
-        // Assert the results
-        System.assertEquals(true, result, 'Expected the method to return true for a non-blank title.');
+        System.assert(result, 'Note record was not created successfully');
+        List<My_Note__c> notes = [SELECT Id, Name, Note_Description__c FROM My_Note__c];
+        System.assertEquals(1, notes.size(), 'Incorrect number of note records');
+        System.assertEquals('Test Title', notes[0].Name, 'Incorrect note title');
+        System.assertEquals('Test Description', notes[0].Note_Description__c, 'Incorrect note description');
+        
+        // Test blank title
+        result = NoteTakingController.createNoteRecord('', 'Test Description');
+        System.assert(!result, 'Note record should not be created with blank title');
+    }
 
-        // Verify that the record was inserted successfully
-        List<My_Note__c> notes = [SELECT Id, Name, Note_Description__c FROM My_Note__c WHERE Name = :title];
-        System.assertEquals(1, notes.size(), 'Expected one My_Note__c record to be inserted.');
-        My_Note__c insertedNote = notes[0];
-        System.assertEquals(title, insertedNote.Name, 'Title of the inserted note does not match.');
-        System.assertEquals(description, insertedNote.Note_Description__c, 'Description of the inserted note does not match.');
+    @isTest
+    static void testGetNotes() {
+        // Insert a test note record
+        My_Note__c note = new My_Note__c(Name='Test Title', Note_Description__c='Test Description');
+        insert note;
 
-        // Test the scenario when title is blank
         Test.startTest();
-        result = NoteTakingController.createNoteRecord('', description);
+        List<My_Note__c> result = NoteTakingController.getNotes();
         Test.stopTest();
 
-        // Assert the results
-        System.assertEquals(false, result, 'Expected the method to return false for a blank title.');
+        System.assertEquals(1, result.size(), 'Incorrect number of note records');
+        System.assertEquals('Test Title', result[0].Name, 'Incorrect note title');
+        System.assertEquals('Test Description', result[0].Note_Description__c, 'Incorrect note description');
+    }
 
-        // Verify that no new record was inserted when the title is blank
-        notes = [SELECT Id, Name, Note_Description__c FROM My_Note__c WHERE Name = :title];
-        System.assertEquals(1, notes.size(), 'Expected no new My_Note__c record to be inserted for blank title.');
+    @isTest
+    static void testUpdateNoteRecord() {
+        // Insert a test note record
+        My_Note__c note = new My_Note__c(Name='Test Title', Note_Description__c='Test Description');
+        insert note;
+
+        Test.startTest();
+        Boolean result = NoteTakingController.updateNoteRecord(note.Id, 'Updated Title', 'Updated Description');
+        Test.stopTest();
+
+        System.assert(result, 'Note record was not updated successfully');
+        My_Note__c updatedNote = [SELECT Id, Name, Note_Description__c FROM My_Note__c WHERE Id = :note.Id];
+        System.assertEquals('Updated Title', updatedNote.Name, 'Incorrect note title');
+        System.assertEquals('Updated Description', updatedNote.Note_Description__c, 'Incorrect note description');
+        
+        // Test blank noteId
+        result = NoteTakingController.updateNoteRecord('', 'Updated Title', 'Updated Description');
+        System.assert(!result, 'Note record should not be updated with blank noteId');
+    }
+
+    @isTest
+    static void testDeleteNoteRecord() {
+        // Insert a test note record
+        My_Note__c note = new My_Note__c(Name='Test Title', Note_Description__c='Test Description');
+        insert note;
+
+        Test.startTest();
+        Boolean result = NoteTakingController.deleteNoteRecord(note.Id);
+        Test.stopTest();
+
+        System.assert(result, 'Note record was not deleted successfully');
+        List<My_Note__c> notes = [SELECT Id FROM My_Note__c WHERE Id = :note.Id];
+        System.assertEquals(0, notes.size(), 'Note record was not deleted');
+        
+        // Test blank noteId
+        result = NoteTakingController.deleteNoteRecord('');
+        System.assert(!result, 'Note record should not be deleted with blank noteId');
     }
 }
