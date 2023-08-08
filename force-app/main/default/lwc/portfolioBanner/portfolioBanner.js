@@ -7,10 +7,10 @@ import COMPANY_NAME from "@salesforce/schema/Portfolio__c.CompanyName__c";
 import DESIGNATION from "@salesforce/schema/Portfolio__c.Designation__c";
 
 export default class PortfolioBanner extends LightningElement {
-  @api recordId; //= "a015i000011NJLiAAO";
-  @api linkedinUrl; //= "https://in.linkedin.com/in/tamal-datta-758493241?trk=people-guest_people_search-card";
-  @api githubUrl; //= "https://github.com/tamaldatta07";
-  @api trailheadUrl; //= "https://www.salesforce.com/trailblazer/tdatta11";
+  @api recordId; 
+  @api linkedinUrl; 
+  @api githubUrl; 
+  @api trailheadUrl; 
   @api blogUrl;
   @api youtubeUrl;
   @api twitterUrl;
